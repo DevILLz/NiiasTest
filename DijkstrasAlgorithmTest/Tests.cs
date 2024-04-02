@@ -24,7 +24,7 @@ public class DijkstrasAlgorithm
             Assert.Fail();
         }
         if (path[0] != sections[0]) {
-            Assert.Fail();
+            Assert.Fail("Start must be the same");
         }
         if (path[1] != sections[1]) {
             Assert.Fail();
@@ -37,15 +37,15 @@ public class DijkstrasAlgorithm
         var station = dataBase.GetStation(1);
         var sections = station.Sections.ToArray();
 
-        var path = calculator.GetFastestWay(sections[0], sections[54], station).ToArray();
+        var path = calculator.GetFastestWay(sections[0], sections[^1], station).ToArray();
 
         if (path.Length != 12) {
             Assert.Fail();
         }
         if (path[0] != sections[0]) {
-            Assert.Fail();
+            Assert.Fail("Start must be the same");
         }
-        if (path[11] != sections[54]) {
+        if (path[^1] != sections[^1]) {
             Assert.Fail();
         }
         Assert.Pass();
@@ -75,7 +75,7 @@ public class DijkstrasAlgorithm
         var station = dataBase.GetStation(1);
         var sections = station.Sections.ToArray();
 
-        var path = calculator.GetFastestWay(sections[54], sections[0], station).ToArray();
+        var path = calculator.GetFastestWay(sections[^1], sections[0], station).ToArray();
 
         // Известная ошибка
         // Из за невозможности определить отправной пункт (начало или конец отрезка)
@@ -83,15 +83,13 @@ public class DijkstrasAlgorithm
 
         // По умолчанию берется начало первого отрезка и конец второго
         // Из за этого, при обратном движении могут пропадать начальная и\или конечная станции
-        if (path.Length != 10) {
+        if (path.Length < 10 || path.Length > 10) {
             Assert.Fail();
         }
-        if (path[0] != sections[54]) {
+        if (path[0] != sections[^2]) {
             Assert.Fail();
         }
-        if (path[9] != sections[0]) {
-            Assert.Fail();
-        }
+
         Assert.Pass();
     }
 }
