@@ -1,44 +1,73 @@
 using DataBase;
 using Service;
+using System.Text;
 
 IDataBase db = new DataBaseContext();
 var station = db.GetStation(1);
-
-var parks = station.Parks.ToList();
-Console.WriteLine($"Station: {station.Name}");
-Console.WriteLine($"Parks count: {parks.Count}");
+var sections = station.Sections.ToList();
+Console.WriteLine($"Station: {station.Name} \n");
 
 while (true) {
-    foreach (var park in parks) {
-        Console.WriteLine($"{park.Id}.{park.Name}");
+    Console.ForegroundColor = ConsoleColor.DarkGray;
+    foreach (var section in sections) {
+        Console.WriteLine($"{section.Id}.{section.Name}");
     }
-    Console.WriteLine($"Select the park for which you want to get the peaks (index or name)");
+    Console.ResetColor();
+    Console.WriteLine();
+    Console.WriteLine($"Select the start section (index or name)");
 
-    var select = Console.ReadLine();
+    var selectStart = Console.ReadLine();
 
-    RailwayPark selectedPark = null;
-    var isIndex = int.TryParse(select, out var index);
-    if (isIndex && index > 0 && (parks.Count - 1) <= index) {
-        selectedPark = parks[index - 1];
+    TrackSection selectedStartSection = null;
+    var isIndex = int.TryParse(selectStart, out var indexStart);
+    if (isIndex && indexStart > 0 && sections.Count >= indexStart) {
+        selectedStartSection = sections[indexStart - 1];
     }
     else {
-        selectedPark = parks.FirstOrDefault(p => p.Name == select);
+        selectedStartSection = sections.FirstOrDefault(p => p.Name == selectStart);
     }
 
-    if (selectedPark is null)
+    if (selectedStartSection is null) {
         Console.WriteLine("Sequence doesn't contains that item");
-    var calculator = new StationCalculatorService();
-
-    var parkArea = calculator.GetPeaksOfThePark(selectedPark);
-
-    Console.WriteLine("Peaks:");
-    foreach (var point in parkArea) {
-        Console.Write($"Point - X:{point.X} Y:{point.Y} ");
-        Console.Write("Section - ");
-        foreach (var section in calculator.GetSectionByPoint(point, selectedPark)) {
-            Console.Write($"{section.Name} ");
-        } // может быть несколько секций, если есть пересечения
-
-        Console.WriteLine();
+        Console.WriteLine("\nContinue? (enter)");
+        Console.ReadKey();
+        continue;
     }
+
+    Console.WriteLine($"Select the end section (index or name)");
+    var selectEnd = Console.ReadLine();
+
+    TrackSection selectedEndSection = null;
+    var isIndexEnd = int.TryParse(selectEnd, out var indexEnd);
+    if (isIndexEnd && indexEnd > 0 && sections.Count >= indexEnd) {
+        selectedEndSection = sections[indexEnd - 1];
+    }
+    else {
+        selectedEndSection = sections.FirstOrDefault(p => p.Name == selectEnd);
+    }
+
+    if (selectedEndSection is null) {
+        Console.WriteLine("Sequence doesn't contains that item");
+        Console.WriteLine("\nContinue? (enter)");
+        Console.ReadKey();
+        continue;
+    }
+        
+    var calculator = new StationCalculatorService();
+    var fastestWay = calculator.GetFastestWay(selectedStartSection, selectedEndSection, station);
+
+    Console.WriteLine();
+
+    var sectionsString = new StringBuilder();
+    foreach (var section in fastestWay) {
+        sectionsString.Append($"{section.Name} -> ");
+    }
+    sectionsString.Remove(sectionsString.Length - 3, 2);
+
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine(sectionsString.ToString());
+    Console.ResetColor();
+
+    Console.WriteLine("\n\nContinue? (enter)");
+    Console.ReadKey();
 }

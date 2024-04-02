@@ -1,5 +1,6 @@
 using DataBase;
 using System.Windows;
+using System.Collections.Generic;
 
 namespace Service;
 
@@ -34,5 +35,13 @@ public class StationCalculatorService
         return sectionsWithThisPoint;
     }
 
-}
 
+    public IEnumerable<TrackSection> GetFastestWay(TrackSection start, TrackSection end, RailwayStation station) {
+        var sectionsInTheWay = new List<TrackSection>();
+        sectionsInTheWay.Add(start);
+        sectionsInTheWay.Add(end);
+
+        return sectionsInTheWay;
+    }
+
+}

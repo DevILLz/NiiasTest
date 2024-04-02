@@ -19,20 +19,24 @@ while (true) {
 
     RailwayPark selectedPark = null;
     var isIndex = int.TryParse(select, out var index);
-    if (isIndex && index > 0 && (parks.Count - 1) <= index) {
+    if (isIndex && index > 0 && (parks.Count - 1) >= index) {
         selectedPark = parks[index - 1];
     }
     else {
         selectedPark = parks.FirstOrDefault(p => p.Name == select);
     }
 
-    if (selectedPark is null)
+    if (selectedPark is null) {
         Console.WriteLine("Sequence doesn't contains that item");
+        Console.WriteLine("\nContinue? (enter)");
+        Console.ReadKey();
+        continue;
+    }
     var calculator = new StationCalculatorService();
 
     var parkArea = calculator.GetPeaksOfThePark(selectedPark);
 
-        Console.WriteLine("Peaks:");
+    Console.WriteLine("Peaks:");
     foreach (var point in parkArea) {
         Console.Write($"Point - X:{point.X} Y:{point.Y} ");
         Console.Write("Section - ");
