@@ -36,12 +36,13 @@ public class DataBaseContext : IDataBase
         park1.AddTrack(trak12);
         park2.AddTrack(trak13);
 
-        var trak21 = new Track { Id = 4 };
+        var trak14 = new Track { Id = 4 };
         var trak22 = new Track { Id = 5 };
         var trak23 = new Track { Id = 6 };
         var trak24 = new Track { Id = 7 };
 
-        park1.AddTrack(trak21);
+        park1.AddTrack(trak14);
+
         park2.AddTrack(trak22);
         park2.AddTrack(trak23);
         park2.AddTrack(trak24);
@@ -51,7 +52,7 @@ public class DataBaseContext : IDataBase
         foreach (var item in Enumerable.Range(0, 10)) {
             trak11.AddSection(new TrackSection {
                 Id = sectionId++,
-                Name = $"S1_P1_T{item}",
+                Name = $"S1_P1_T1_TS{item}",
                 Start = new Point { X = item, Y = 1 },
                 End = new Point { X = item + 1, Y = 1 },
             });
@@ -75,16 +76,15 @@ public class DataBaseContext : IDataBase
             });
         }
 
-
-         //↓ 2 простые прямые линии, пересекающие 3 верхние
         foreach (var item in Enumerable.Range(0, 8)) {
-            trak21.AddSection(new TrackSection {
+            trak14.AddSection(new TrackSection {
                 Id = sectionId++,
-                Name = $"S1_P2_T1_TS{item}",
+                Name = $"S1_P1_T4_TS{item}",
                 Start = new Point { X = item, Y = item },
                 End = new Point { X = item + 1, Y = item + 1 },
             });
         }
+
 
         foreach (var item in Enumerable.Range(0, 7)) {
             trak22.AddSection(new TrackSection {
@@ -107,7 +107,7 @@ public class DataBaseContext : IDataBase
         foreach (var item in Enumerable.Range(0, 8)) {
             trak24.AddSection(new TrackSection {
                 Id = sectionId++,
-                Name = $"S1_P12_T4_TS{item}",
+                Name = $"S1_P2_T4_TS{item}",
                 Start = new Point { X = item, Y = 8 },
                 End = new Point { X = item + 1, Y = 8 },
             });

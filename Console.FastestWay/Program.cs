@@ -9,8 +9,9 @@ Console.WriteLine($"Station: {station.Name} \n");
 
 while (true) {
     Console.ForegroundColor = ConsoleColor.DarkGray;
+    int i = 1;
     foreach (var section in sections) {
-        Console.WriteLine($"{section.Id}.{section.Name}");
+        Console.WriteLine($"{i++}.{section.Name}");
     }
     Console.ResetColor();
     Console.WriteLine();
@@ -61,6 +62,13 @@ while (true) {
     var sectionsString = new StringBuilder();
     foreach (var section in fastestWay) {
         sectionsString.Append($"{section.Name} -> ");
+    }
+
+    if (sectionsString.Length == 0) {
+        Console.WriteLine("No path between points");
+        Console.WriteLine("\nContinue? (enter)");
+        Console.ReadKey();
+        continue;
     }
     sectionsString.Remove(sectionsString.Length - 3, 2);
 
