@@ -1,5 +1,4 @@
 using System.Windows;
-using System.Xml.Linq;
 
 namespace DataBase;
 
@@ -29,23 +28,20 @@ public class DataBaseContext : IDataBase
         var park1 = new RailwayPark { Id = 1, Name = "P1" };
         var park2 = new RailwayPark { Id = 2, Name = "P2" };
 
-        station.AddPark(park1);
-        station.AddPark(park2);
-
         var trak11 = new Track { Id = 1 };
         var trak12 = new Track { Id = 2 };
         var trak13 = new Track { Id = 3 };
 
         park1.AddTrack(trak11);
         park1.AddTrack(trak12);
-        park1.AddTrack(trak13);
+        park2.AddTrack(trak13);
 
         var trak21 = new Track { Id = 4 };
         var trak22 = new Track { Id = 5 };
         var trak23 = new Track { Id = 6 };
         var trak24 = new Track { Id = 7 };
 
-        park2.AddTrack(trak21);
+        park1.AddTrack(trak21);
         park2.AddTrack(trak22);
         park2.AddTrack(trak23);
         park2.AddTrack(trak24);
@@ -90,7 +86,7 @@ public class DataBaseContext : IDataBase
             });
         }
 
-        foreach (var item in Enumerable.Range(0, 9)) {
+        foreach (var item in Enumerable.Range(0, 7)) {
             trak22.AddSection(new TrackSection {
                 Id = sectionId++,
                 Name = $"S1_P2_T2_TS{item}",

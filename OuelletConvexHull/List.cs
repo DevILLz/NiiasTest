@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -126,7 +126,7 @@ namespace ConvexHull
 		{
 			get
 			{
-				if ((uint)index >= (uint)this._size)
+				if ((uint)index > (uint)this._size)
 					throw new ArgumentOutOfRangeException();
 				return this.Items[index];
 			}
