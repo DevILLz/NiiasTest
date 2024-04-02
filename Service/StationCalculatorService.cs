@@ -28,27 +28,36 @@ public class StationCalculatorService
         return sectionsWithThisPoint;
     }
 
-    private Graph graphCache = new Graph();
+    private Graph graphCache;
     public IEnumerable<TrackSection> GetFastestWay(TrackSection start, TrackSection end, RailwayStation station) {
         //добавление вершин
 
-
-        var points = GetPoints(station.Sections);
-        foreach (var point in points) {
-            var edges = new Dictionary<Point, int>();
-            foreach (var secttion in station.Sections.Where(s => s.Start == point || s.End == point)) {
-                if (secttion.End == point) {
-                    edges.Add(secttion.Start, 1);
+        if (graphCache is null) {
+            graphCache = new Graph();
+            var points = GetPoints(station.Sections);
+            foreach (var point in points) {
+                var edges = new Dictionary<Point, int>();
+                foreach (var secttion in station.Sections.Where(s => s.Start == point || s.End == point)) {
+                    if (secttion.End == point) {
+                        edges.Add(secttion.Start, 1);
+                    }
+                    else {
+                        edges.Add(secttion.End, 1);
+                    }
                 }
-                else {
-                    edges.Add(secttion.End, 1);
-                }
+                graphCache.AddVertex(point, edges);
             }
-            graphCache.AddVertex(point, edges);
         }
 
         var path = graphCache.GetShortestPath(start.Start, end.End);
-        path.Add(start.Start);
+        if (path.Count != 0) {
+            path.Add(start.Start);
+        }
+        else {
+            path = graphCache.GetShortestPath(start.End, end.Start);
+            path.Add(start.End);
+
+        }
 
         var sectionsInTheWay = new List<TrackSection>();
         for (int i = path.Count - 1; i > 0; i--) {

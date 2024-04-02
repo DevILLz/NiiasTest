@@ -104,15 +104,6 @@ public class DataBaseContext : IDataBase
             });
         }
 
-        foreach (var item in Enumerable.Range(0, 8)) {
-            trak24.AddSection(new TrackSection {
-                Id = sectionId++,
-                Name = $"S1_P2_T4_TS{item}",
-                Start = new Point { X = item, Y = 8 },
-                End = new Point { X = item + 1, Y = 8 },
-            });
-        }
-
         station.AddPark(park1);
         station.AddPark(park2);
         return station;
