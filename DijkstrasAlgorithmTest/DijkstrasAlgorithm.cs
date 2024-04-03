@@ -1,11 +1,12 @@
 using DataBase;
+using Infrastructure.Interfaces;
 using Service;
 
 namespace Tests;
 
 public class DijkstrasAlgorithm
 {
-    private StationCalculatorService calculator;
+    private IStationCalculatorService calculator;
     private IDataBase dataBase;
     [SetUp]
     public void Setup() {
@@ -14,11 +15,11 @@ public class DijkstrasAlgorithm
     }
 
     [Test]
-    public void GetForward() {
+    public async Task GetForward() {
         var station = dataBase.GetStation(1);
         var sections = station.Sections.ToArray();
 
-        var path = calculator.GetFastestWay(sections[0], sections[1], station).ToArray();
+        var path = (await calculator.GetFastestWay(sections[0], sections[1], station)).ToArray();
 
         if (path.Length != 2) {
             Assert.Fail();
@@ -33,13 +34,13 @@ public class DijkstrasAlgorithm
     }
 
     [Test]
-    public void GetForwardLong() {
+    public async Task GetForwardLong() {
         var station = dataBase.GetStation(1);
         var sections = station.Sections.ToArray();
 
-        var path = calculator.GetFastestWay(sections[0], sections[^1], station).ToArray();
+        var path = (await calculator.GetFastestWay(sections[0], sections[^1], station)).ToArray();
 
-        if (path.Length != 12) {
+        if (path.Length != 16) {
             Assert.Fail();
         }
         if (path[0] != sections[0]) {
@@ -52,11 +53,11 @@ public class DijkstrasAlgorithm
     }
 
     [Test]
-    public void GetBackward() {
+    public async Task GetBackward() {
         var station = dataBase.GetStation(1);
         var sections = station.Sections.ToArray();
 
-        var path = calculator.GetFastestWay(sections[1], sections[0], station).ToArray();
+        var path = (await calculator.GetFastestWay(sections[1], sections[0], station)).ToArray();
 
         if (path.Length != 2) {
             Assert.Fail();
@@ -71,11 +72,11 @@ public class DijkstrasAlgorithm
     }
 
     [Test]
-    public void GetBackwardLong() {
+    public async Task GetBackwardLong() {
         var station = dataBase.GetStation(1);
         var sections = station.Sections.ToArray();
 
-        var path = calculator.GetFastestWay(sections[^1], sections[0], station).ToArray();
+        var path = (await calculator.GetFastestWay(sections[^1], sections[0], station)).ToArray();
 
         // Известная ошибка
         // Из за невозможности определить отправной пункт (начало или конец отрезка)
@@ -83,7 +84,7 @@ public class DijkstrasAlgorithm
 
         // По умолчанию берется начало первого отрезка и конец второго
         // Из за этого, при обратном движении могут пропадать начальная и\или конечная станции
-        if (path.Length < 10 || path.Length > 10) {
+        if (path.Length < 14 || path.Length > 16) {
             Assert.Fail();
         }
         if (path[0] != sections[^2]) {

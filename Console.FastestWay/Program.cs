@@ -1,12 +1,17 @@
 using DataBase;
+using Domain;
+using Infrastructure.Interfaces;
 using Service;
 using System.Text;
 
 IDataBase db = new DataBaseContext();
+
+IStationCalculatorService calculator = new StationCalculatorService();
+
 var station = db.GetStation(1);
 var sections = station.Sections.ToList();
-Console.WriteLine($"Station: {station.Name} \n");
 
+Console.WriteLine($"Station: {station.Name} \n");
 while (true) {
     Console.ForegroundColor = ConsoleColor.DarkGray;
     int i = 1;
@@ -53,9 +58,8 @@ while (true) {
         Console.ReadKey();
         continue;
     }
-        
-    var calculator = new StationCalculatorService();
-    var fastestWay = calculator.GetFastestWay(selectedStartSection, selectedEndSection, station);
+
+    var fastestWay = await calculator.GetFastestWay(selectedStartSection, selectedEndSection, station);
 
     Console.WriteLine();
 

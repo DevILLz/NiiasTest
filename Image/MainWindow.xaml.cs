@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace Image;
+namespace WPF.StationViewTest;
 
 public partial class MainWindow : Window
 {

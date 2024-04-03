@@ -1,4 +1,3 @@
-using DataBase;
 using Service;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
@@ -7,8 +6,11 @@ using System.Windows;
 using System.ComponentModel;
 using System.Windows.Threading;
 using System.Windows.Controls;
+using Domain;
+using DataBase;
+using Infrastructure.Interfaces;
 
-namespace Image;
+namespace WPF.StationViewTest;
 
 public class MainWindowViewModel : INotifyPropertyChanged
 {
@@ -21,13 +23,13 @@ public class MainWindowViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler PropertyChanged;
 
     public ObservableCollection<RailwayPark> Parks { get; set; }
-    public RailwayPark SelectedPark { 
+    public RailwayPark SelectedPark {
         get => selectedPark;
         set {
             selectedPark = value;
             NotifyPropertyChanged("SelectedPark");
-            CalculateArea();
-        } 
+            CalculateArea().GetAwaiter().GetResult();
+        }
     }
 
     public MainWindowViewModel(Canvas stationDrawArea) {
@@ -42,23 +44,6 @@ public class MainWindowViewModel : INotifyPropertyChanged
     }
 
     private void CreateStation() {
-        foreach (var section in station.Sections) {
-            var sectionLine = new Line {
-                Stroke = section.Track.Park.Id == SelectedPark.Id
-                    ? Brushes.Blue
-                    : Brushes.Black,
-                X1 = section.Start.X * graphScale,
-                X2 = section.End.X * graphScale,
-                Y1 = section.Start.Y * graphScale,
-                Y2 = section.End.Y * graphScale,
-
-                StrokeThickness = 2
-            };
-            stationDrawArea.Children.Add(sectionLine);
-        }
-    }
-
-    private void CalculateArea() {
         stationDrawArea.Children.Clear();
         foreach (var section in station.Sections) {
             var sectionLine = new Line {
@@ -74,8 +59,12 @@ public class MainWindowViewModel : INotifyPropertyChanged
             };
             stationDrawArea.Children.Add(sectionLine);
         }
+    }
 
-        var parkArea = new StationCalculatorService().GetPeaksOfThePark(SelectedPark);
+    private async Task CalculateArea() {
+        CreateStation();
+
+        var parkArea = await new StationCalculatorService().GetPeaksOfThePark(SelectedPark);
         stationDrawArea.Children.Add(new Polygon {
             Points = new PointCollection(parkArea.Select(p => new Point { X = p.X * graphScale, Y = p.Y * graphScale })),
             Fill = new SolidColorBrush(Color.FromArgb(60, 155, 255, 255))
@@ -88,15 +77,15 @@ public class MainWindowViewModel : INotifyPropertyChanged
                 Width = 6,
                 Fill = Brushes.Red,
                 Margin = new Thickness {
-                    Left = (point.X * graphScale) - 3,
-                    Top = (point.Y * graphScale) - 3
+                    Left = point.X * graphScale - 3,
+                    Top = point.Y * graphScale - 3
                 }
             });
         }
     }
 
     protected void NotifyPropertyChanged(string propertyName) {
-        PropertyChangedEventHandler propertyChanged = PropertyChanged;
+        var propertyChanged = PropertyChanged;
         if (propertyChanged != null) {
             Application.Current.Dispatcher.BeginInvoke(new Action(() => propertyChanged(this, new PropertyChangedEventArgs(propertyName))), DispatcherPriority.Normal);
         }

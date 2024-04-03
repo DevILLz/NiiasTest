@@ -1,8 +1,11 @@
 using DataBase;
+using Domain;
+using Infrastructure.Interfaces;
 using Service;
-using System.Windows;
 
 IDataBase db = new DataBaseContext();
+IStationCalculatorService calculator = new StationCalculatorService();
+
 var station = db.GetStation(1);
 
 var parks = station.Parks.ToList();
@@ -19,7 +22,7 @@ while (true) {
 
     RailwayPark selectedPark = null;
     var isIndex = int.TryParse(select, out var index);
-    if (isIndex && index > 0 && (parks.Count - 1) >= index) {
+    if (isIndex && index > 0 && parks.Count >= index) {
         selectedPark = parks[index - 1];
     }
     else {
@@ -32,9 +35,8 @@ while (true) {
         Console.ReadKey();
         continue;
     }
-    var calculator = new StationCalculatorService();
 
-    var parkArea = calculator.GetPeaksOfThePark(selectedPark);
+    var parkArea = await calculator.GetPeaksOfThePark(selectedPark);
 
     Console.WriteLine("Peaks:");
     foreach (var point in parkArea) {

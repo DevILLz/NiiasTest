@@ -1,20 +1,12 @@
-using DataBase;
+using Domain;
+using Infrastructure.Interfaces;
 using System.Windows;
 
 namespace Service;
 
-public class StationCalculatorService
+public class StationCalculatorService : IStationCalculatorService
 {
-    public IEnumerable<Point> GetPeaksOfThePark(RailwayPark park) {
-        var sections = new List<TrackSection>();
-        var points = GetPoints(park.Tracks.SelectMany(t => t.Sections));
-        var disctinctPoints = points.ToList();
-        var convex = new ConvexHull.Ouellet.ConvexHull(disctinctPoints);
-        convex.CalcConvexHull();
-        var hullsPoints = convex.GetResultsAsArrayOfPoint();
-        return hullsPoints.Where(points.Contains);
-    }
-
+    private Graph graphCache;
 
     public IEnumerable<TrackSection> GetSectionByPoint(Point point, RailwayPark park) {
         var sectionsWithThisPoint = new List<TrackSection>();
@@ -28,8 +20,23 @@ public class StationCalculatorService
         return sectionsWithThisPoint;
     }
 
-    private Graph graphCache;
-    public IEnumerable<TrackSection> GetFastestWay(TrackSection start, TrackSection end, RailwayStation station) {
+    public async Task<IEnumerable<Point>> GetPeaksOfThePark(RailwayPark park) {
+        var sections = new List<TrackSection>();
+
+        var points = GetPoints(park.Tracks.SelectMany(t => t.Sections));
+        var disctinctPoints = points.ToList();
+
+        var convex = new ConvexHull.Ouellet.ConvexHull(disctinctPoints);
+
+        var hullsPoints = await Task.Factory.StartNew(() => {
+            convex.CalcConvexHull();
+            return convex.GetResultsAsArrayOfPoint();
+        });
+        
+        return hullsPoints.Where(points.Contains).Distinct();
+    }
+
+    public async Task<IEnumerable<TrackSection>> GetFastestWay(TrackSection start, TrackSection end, RailwayStation station) {
         //добавление вершин
 
         if (graphCache is null) {
@@ -49,12 +56,12 @@ public class StationCalculatorService
             }
         }
 
-        var path = graphCache.GetShortestPath(start.Start, end.End);
+        var path = await Task.Factory.StartNew(() => graphCache.GetShortestPath(start.Start, end.End));
         if (path.Count != 0) {
             path.Add(start.Start);
         }
         else {
-            path = graphCache.GetShortestPath(start.End, end.Start);
+            path = await Task.Factory.StartNew(() => graphCache.GetShortestPath(start.End, end.Start));
             path.Add(start.End);
 
         }
